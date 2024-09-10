@@ -28,7 +28,7 @@ curl -fsSL https://oddish3.github.io/dotfiles/etc/install | bash
 </summary><p>
 
 ```bash
-$ git clone --recursive https://github.com/wookayin/dotfiles.git ~/.dotfiles
+$ git clone --recursive https://github.com/oddish3/dotfiles ~/.dotfiles
 $ cd ~/.dotfiles && python install.py
 ```
 
