@@ -9,7 +9,7 @@ Installation
 ### 👉 One-liner (if you trust me):
 
 ```bash
-curl -fsSL https://dotfiles.wook.kr/etc/install | bash
+curl -fsSL https://oddish3.github.io/dotfiles/etc/install | bash
 ```
 
 <details><summary>

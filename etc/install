@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Usage:
-# curl -fsSL https://dotfiles.wook.kr/etc/install | bash
+# curl -fsSL https://oddish3.github.io/dotfiles/etc/install | bash
 
 cat <<EOF
    @wookayin's              ███████╗██╗██╗     ███████╗███████╗
