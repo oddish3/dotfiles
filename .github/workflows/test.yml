@@ -39,6 +39,10 @@ jobs:
       run: |
         curl -fsSL https://oddish3.github.io/dotfiles/etc/install | bash
 
+    - name: Change default shell to zsh
+      run: |
+        sudo chsh -s $(which zsh) $USER
+
     - name: Verify installation
       run: |
         set -e
@@ -50,4 +54,12 @@ jobs:
         for file in .bashrc .gitconfig .vimrc .zshrc; do
           [ -L "$HOME/$file" ] || (echo "$file is not symlinked" && exit 1)
         done
+        echo "Current shell: $SHELL"
         echo "All checks passed successfully!"
+
+    - name: Verify zsh is default shell
+      run: |
+        if [ "$SHELL" != "$(which zsh)" ]; then
+          echo "ZSH is not the default shell"
+          exit 1
+        fi
