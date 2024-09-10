@@ -1,0 +1,21 @@
+name: Test Dotfiles Installation
+
+   on:
+     push:
+       branches: [ main ]
+     pull_request:
+       branches: [ main ]
+
+   jobs:
+     test:
+       runs-on: ubuntu-latest
+       steps:
+       - uses: actions/checkout@v2
+       - name: Test installation script
+         run: |
+           docker build -t dotfiles-test -f- . <<EOF
+           FROM ubuntu:latest
+           RUN apt-get update && apt-get install -y curl
+           CMD ["bash", "-c", "curl -fsSL https://oddish3.github.io/dotfiles/etc/install | bash"]
+           EOF
+           docker run --rm dotfiles-test
