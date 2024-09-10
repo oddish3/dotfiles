@@ -2,9 +2,11 @@ name: Test Dotfiles Installation
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - '*'  # Trigger on pushes to any branch
   pull_request:
-    branches: [ main ]
+    branches:
+      - '*'  # Trigger on pull requests to any branch
 
 jobs:
   test:
