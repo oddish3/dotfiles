@@ -13,38 +13,40 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    
+
     - name: Set up test environment
       run: |
         sudo apt-get update
         sudo apt-get install -y git curl wget python3 python3-pip
-    
-    - name: Set Git config
+
+    - name: Create .gitconfig.secret
       run: |
-        git config --global user.name "${{ secrets.GIT_USER_NAME }}"
-        git config --global user.email "${{ secrets.GIT_USER_EMAIL }}"
-      
+        echo "[user]" > ~/.gitconfig.secret
+        echo "name = ${{ secrets.GIT_USER_NAME }}" >> ~/.gitconfig.secret
+        echo "email = ${{ secrets.GIT_USER_EMAIL }}" >> ~/.gitconfig.secret
+
+    - name: Configure Git to include .gitconfig.secret
+      run: |
+        echo "[include]" > ~/.gitconfig
+        echo "path = ~/.gitconfig.secret" >> ~/.gitconfig
+
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y zsh
-    
+
     - name: Install dotfiles
       run: |
         curl -fsSL https://oddish3.github.io/dotfiles/etc/install | bash
-    
+
     - name: Verify installation
       run: |
         set -e
-        # Check if .dotfiles directory exists
         [ -d "$HOME/.dotfiles" ] || (echo ".dotfiles directory not found" && exit 1)
-        # Check if key directories exist
         for dir in bin config etc git nvim python tmux vim zsh; do
           [ -d "$HOME/.dotfiles/$dir" ] || (echo "$dir directory not found" && exit 1)
         done
-        # Check if install.py exists
         [ -f "$HOME/.dotfiles/install.py" ] || (echo "install.py not found" && exit 1)
-        # Check if some key dotfiles are symlinked
         for file in .bashrc .gitconfig .vimrc .zshrc; do
           [ -L "$HOME/$file" ] || (echo "$file is not symlinked" && exit 1)
         done
