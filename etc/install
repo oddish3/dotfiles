@@ -3,7 +3,7 @@
 # Usage:
 # curl -fsSL https://dotfiles.wook.kr/etc/install | bash
 
-cat <<EOF
+cat <<'EOF'
 @oddish3(inspired by @wookayin) install
 ______ _____ ___________ _____ _      _____ _____ 
 |  _  \  _  |_   _|  ___|_   _| |    |  ___/  ___|
