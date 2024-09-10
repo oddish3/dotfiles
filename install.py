@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-   @oddish3(inspired by @wookayin)
+   @oddish3(inspired by @wookayin) install.py
 ______ _____ ___________ _____ _      _____ _____ 
 |  _  \  _  |_   _|  ___|_   _| |    |  ___/  ___|
 | | | | | | | | | | |_    | | | |    | |__ \ `--. 
