@@ -50,10 +50,6 @@ jobs:
         echo "[include]" > ~/.gitconfig
         echo "path = ~/.gitconfig.secret" >> ~/.gitconfig
 
-    - name: Install pynvim
-      run: |
-        python3 -m pip install --user --upgrade pynvim
-
     - name: Install dotfiles
       run: |
         set -x  # Enable verbose output
