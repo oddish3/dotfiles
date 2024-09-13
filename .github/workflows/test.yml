@@ -54,6 +54,11 @@ jobs:
       run: |
         python3 -m pip install --user --upgrade pynvim
 
+    - name: verify neovim installation
+      run: |
+        which nvim
+        nvim --version
+
     - name: Set up minimal neovim config
       run: |
         mkdir -p ~/.config/nvim
@@ -74,19 +79,18 @@ jobs:
           -- your plugins here
         })
         EOF
-
-    - name: debug neovim setup
-      run: |
-        echo "Neovim version:"
-        ~/.local/bin/nvim --version
-        echo "Python version:"
-        python3 --version
-        echo "Pynvim version:"
-        python3 -c "import pynvim; print(pynvim.__version__)"
-        echo "Neovim config files:"
-        ls -R ~/.config/nvim
-        echo "Neovim init.lua contents:"
-        cat ~/.config/nvim/init.lua
+        - name: Debug Neovim setup
+        run: |
+          echo "Neovim version:"
+          nvim --version
+          echo "Python version:"
+          python3 --version
+          echo "Pynvim version:"
+          python3 -c "import pynvim; print(pynvim.__version__)"
+          echo "Neovim config files:"
+          ls -R ~/.config/nvim
+          echo "Neovim init.lua contents:"
+          cat ~/.config/nvim/init.lua
 
     - name: Check Neovim installation
       run: |
