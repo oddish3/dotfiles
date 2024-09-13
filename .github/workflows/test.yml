@@ -52,14 +52,24 @@ jobs:
 
     - name: Verify installation
       run: |
-        set -ex
-        [ -d "$HOME/.dotfiles" ]
-        for dir in bin config etc git nvim python tmux vim zsh; do
-          [ -d "$HOME/.dotfiles/$dir" ]
-        done
-        [ -f "$HOME/.dotfiles/install.py" ]
-        for file in .bashrc .gitconfig .vimrc .zshrc; do
-          [ -L "$HOME/$file" ]
-        done
-        echo "Current shell: $SHELL"
-        echo "All checks passed successfully!"
+          set -x  # Enable verbose output
+
+          # Check .dotfiles directory
+          [ -d "$HOME/.dotfiles" ] && echo ".dotfiles directory exists" || echo ".dotfiles directory does not exist"
+           # Check subdirectories
+          for dir in bin config etc git nvim python tmux vim zsh; do
+          [ -d "$HOME/.dotfiles/$dir" ] && echo "$dir exists" || echo "$dir does not exist"
+          done
+              # Check install.py
+          [ -f "$HOME/.dotfiles/install.py" ] && echo "install.py exists" || echo "install.py does not exist"
+    
+          # Check dotfiles
+          for file in .bashrc .gitconfig .vimrc .zshrc; do
+            if [ -L "$HOME/$file" ]; then
+              echo "$file is a symlink pointing to $(readlink "$HOME/$file")"
+            elif [ -f "$HOME/$file" ]; then
+             echo "$file exists but is not a symlink"
+            else
+              echo "$file does not exist"
+            fi
+          done
