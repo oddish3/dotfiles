@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-'''
+"""
    @oddish3(inspired by @wookayin) install.py
 ______ _____ ___________ _____ _      _____ _____ 
 |  _  \  _  |_   _|  ___|_   _| |    |  ___/  ___|
@@ -11,8 +11,10 @@ ______ _____ ___________ _____ _      _____ _____
 |___/  \___/  \_/ \_|    \___/\_____/\____/\____/ 
 
    https://dotfiles.wook.kr/
-'''
+"""
+
 print(__doc__)  # print logo.
+
 
 
 import os
@@ -138,18 +140,6 @@ post_actions += [  # fzf
     ./install --all --no-update-rc
 ''']
 
-#post_actions += [  # video2gif
-    #'''#!/bin/bash
-    # Download command line scripts
-    #mkdir -p "$HOME/.local/bin/"
-    #_download() {
-    #    curl -L "$2" > "$1" && chmod +x "$1"
-    #}
-    #ret=0
-    #set -v
-    #_download "$HOME/.local/bin/video2gif" "https://raw.githubusercontent.com/wookayin/video2gif/master/video2gif" || ret=1
-    #exit $ret;
-#''']
 
 post_actions += [  # antidote (zsh plugins)
     '''#!/bin/bash

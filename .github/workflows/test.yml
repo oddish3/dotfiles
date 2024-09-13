@@ -2,23 +2,33 @@ name: Test Dotfiles Installation
 
 on:
   push:
-    branches:
-      - '*'  # Trigger on pushes to any branch
+    branches: ['*']
   pull_request:
-    branches:
-      - '*'  # Trigger on pull requests to any branch
+    branches: ['*']
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ubuntu-version: [20.04, 22.04]
+    runs-on: ubuntu-${{ matrix.ubuntu-version }}
+    timeout-minutes: 15
+
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+
+    - name: Cache apt packages
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt/archives
+        key: ${{ runner.os }}-apt-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: ${{ runner.os }}-apt-
 
     - name: Set up test environment
       run: |
         sudo apt-get update
-        sudo apt-get install -y git curl wget python3 python3-pip
-
+        sudo apt-get install -y git curl wget python3 python3-pip zsh
+      
     - name: Create .gitconfig.secret
       run: |
         echo "[user]" > ~/.gitconfig.secret
@@ -30,29 +40,31 @@ jobs:
         echo "[include]" > ~/.gitconfig
         echo "path = ~/.gitconfig.secret" >> ~/.gitconfig
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y zsh
-
     - name: Install dotfiles
       run: |
+        set -x  # Enable verbose output
         curl -fsSL https://oddish3.github.io/dotfiles/etc/install | bash
+        echo "Exit status: $?"
+
+    - name: Test idempotency
+      run: |
+        set -x  # Enable verbose output
+        curl -fsSL https://oddish3.github.io/dotfiles/etc/install | bash
+        echo "Exit status: $?"
 
     - name: Change default shell to zsh
-      run: |
-        sudo chsh -s $(which zsh) $USER
+      run: sudo chsh -s $(which zsh) $USER
 
     - name: Verify installation
       run: |
-        set -e
-        [ -d "$HOME/.dotfiles" ] || (echo ".dotfiles directory not found" && exit 1)
+        set -ex
+        [ -d "$HOME/.dotfiles" ]
         for dir in bin config etc git nvim python tmux vim zsh; do
-          [ -d "$HOME/.dotfiles/$dir" ] || (echo "$dir directory not found" && exit 1)
+          [ -d "$HOME/.dotfiles/$dir" ]
         done
-        [ -f "$HOME/.dotfiles/install.py" ] || (echo "install.py not found" && exit 1)
+        [ -f "$HOME/.dotfiles/install.py" ]
         for file in .bashrc .gitconfig .vimrc .zshrc; do
-          [ -L "$HOME/$file" ] || (echo "$file is not symlinked" && exit 1)
+          [ -L "$HOME/$file" ]
         done
         echo "Current shell: $SHELL"
         echo "All checks passed successfully!"
@@ -63,3 +75,13 @@ jobs:
           echo "ZSH is not the default shell"
           exit 1
         fi
+
+    - name: Lint shell scripts
+      run: |
+        sudo apt-get install -y shellcheck
+        shellcheck **/*.sh
+
+    - name: Lint Python files
+      run: |
+        pip install flake8
+        flake8 .
