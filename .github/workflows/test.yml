@@ -50,6 +50,15 @@ jobs:
         echo "[include]" > ~/.gitconfig
         echo "path = ~/.gitconfig.secret" >> ~/.gitconfig
 
+    - name: Install pynvim
+      run: |
+        python3 -m pip install --user --upgrade pynvim
+
+    - name: Set Neovim Python provider
+      run: |
+        mkdir -p ~/.config/nvim
+        echo "let g:python3_host_prog = '$(which python3)'" > ~/.config/nvim/init.vim
+
     - name: Install dotfiles
       run: |
         set -x  # Enable verbose output
@@ -108,7 +117,17 @@ jobs:
     - name: Check Neovim installation
       run: |
         ~/.local/bin/nvim --version | head -n3
+        ~/.local/bin/nvim --headless -c 'checkhealth provider' -c 'q' || true
         if [ $? -ne 0 ]; then
-          echo "Neovim installation failed"
+          echo "Neovim installation or health check failed"
           exit 1
         fi
+
+    - name: Debug Neovim Python integration
+      if: failure()
+      run: |
+        python3 -c "import neovim; print(neovim.__file__)"
+        python3 -c "import pynvim; print(pynvim.__file__)"
+        cat ~/.config/nvim/init.vim
+        echo "NVIM_PYTHON_LOG_FILE contents:"
+        cat $NVIM_PYTHON_LOG_FILE || echo "NVIM_PYTHON_LOG_FILE not found or empty"
