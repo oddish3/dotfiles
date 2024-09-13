@@ -54,56 +54,16 @@ jobs:
       run: |
         python3 -m pip install --user --upgrade pynvim
 
-    - name: verify neovim installation
-      run: |
-        which nvim
-        nvim --version
-
-    - name: Set up minimal neovim config
-      run: |
-        mkdir -p ~/.config/nvim
-        cat << EOF > ~/.config/nvim/init.lua
-        local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-        if not vim.loop.fs_stat(lazypath) then
-          vim.fn.system({
-            "git",
-            "clone",
-            "--filter=blob:none",
-            "https://github.com/folke/lazy.nvim.git",
-            "--branch=stable", -- latest stable release
-            lazypath,
-          })
-        end
-        vim.opt.rtp:prepend(lazypath)
-        require("lazy").setup({
-          -- your plugins here
-        })
-        EOF
-        - name: Debug Neovim setup
-        run: |
-          echo "Neovim version:"
-          nvim --version
-          echo "Python version:"
-          python3 --version
-          echo "Pynvim version:"
-          python3 -c "import pynvim; print(pynvim.__version__)"
-          echo "Neovim config files:"
-          ls -R ~/.config/nvim
-          echo "Neovim init.lua contents:"
-          cat ~/.config/nvim/init.lua
-
-    - name: Check Neovim installation
-      run: |
-          ~/.local/bin/nvim --headless -c 'checkhealth provider' -c 'q' || true
-          ~/.local/bin/nvim --headless -c 'Lazy! update' -c 'q' || true
-      if: always()
-
     - name: Install dotfiles
       run: |
         set -x  # Enable verbose output
         curl -fsSL https://oddish3.github.io/dotfiles/etc/install | bash
         echo "Exit status: $?"
 
+    - name: verify neovim installation
+      run: |
+          which nvim
+          nvim --version
 
     - name: Verify installation
       run: |
@@ -119,7 +79,14 @@ jobs:
         echo "Current shell: $SHELL"
         echo "All checks passed successfully!"
 
-    - name: Verify zsh is default shell
+      - name: Check Neovim health
+      run: |
+          nvim --headless -c 'checkhealth provider' -c 'q' || true
+          nvim --headless -c 'Lazy! update' -c 'q' || true
+        if: always()        
+    
+    
+      - name: Verify zsh is default shell
       run: |
         if [ "$SHELL" != "$(which zsh)" ]; then
           echo "ZSH is not the default shell"
