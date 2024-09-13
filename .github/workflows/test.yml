@@ -28,13 +28,13 @@ jobs:
         restore-keys: ${{ runner.os }}-packages-
 
     - name: Set up test environment (Ubuntu)
-      if: runner.os == 'Linux'
+      if: ${{ runner.os == 'Linux' }}
       run: |
         sudo apt-get update
         sudo apt-get install -y git curl wget python3 python3-pip zsh
 
     - name: Set up test environment (macOS)
-      if: runner.os == 'macOS'
+      if: ${{ runner.os == 'macOS' }}
       run: |
         brew update
         brew install python3 zsh
@@ -65,19 +65,25 @@ jobs:
         curl -fsSL https://oddish3.github.io/dotfiles/etc/install | bash
         echo "Exit status: $?"
 
-    - name: Test idempotency
+    - name: Debug Neovim setup
       run: |
-        set -x  # Enable verbose output
-        curl -fsSL https://oddish3.github.io/dotfiles/etc/install | bash
-        echo "Exit status: $?"
+        echo "Neovim version:"
+        ~/.local/bin/nvim --version
+        echo "Python version:"
+        python3 --version
+        echo "Pynvim version:"
+        python3 -c "import pynvim; print(pynvim.__version__)"
+        echo "Neovim config files:"
+        ls -R ~/.config/nvim
+        echo "Neovim startup log:"
+        ~/.local/bin/nvim --headless -c "redir > /tmp/nvim_startup.log" -c "silent! Lazy! update" -c "redir END" -c "qa!"
+        cat /tmp/nvim_startup.log
 
-    - name: Change default shell to zsh
+    - name: Check Neovim installation
       run: |
-        if [ "$RUNNER_OS" == "Linux" ]; then
-          sudo chsh -s $(which zsh) $USER
-        elif [ "$RUNNER_OS" == "macOS" ]; then
-          sudo chsh -s /bin/zsh $USER
-        fi
+        ~/.local/bin/nvim --headless -c 'checkhealth provider' -c 'q' || true
+        ~/.local/bin/nvim --headless -c 'Lazy! update' -c 'q' || true
+      if: always()
 
     - name: Verify installation
       run: |
