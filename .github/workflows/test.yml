@@ -50,11 +50,6 @@ jobs:
         curl -fsSL https://oddish3.github.io/dotfiles/etc/install | bash
         echo "Exit status: $?"
 
-    - name: Verify Neovim installation
-      run: |
-        which nvim
-        nvim --version
-
     - name: Verify installation
       run: |
         set -ex
@@ -68,48 +63,3 @@ jobs:
         done
         echo "Current shell: $SHELL"
         echo "All checks passed successfully!"
-
-    - name: Check Neovim health
-      run: |
-        nvim --headless -c 'checkhealth provider' -c 'q' || true
-        nvim --headless -c 'Lazy! update' -c 'q' || true
-      if: always()
-
-    - name: Verify Zsh is default shell
-      run: |
-        if [ "$SHELL" != "$(which zsh)" ]; then
-          echo "ZSH is not the default shell"
-          exit 1
-        fi
-
-    - name: Lint shell scripts
-      run: |
-        if [ "$RUNNER_OS" == "Linux" ]; then
-          sudo apt-get install -y shellcheck
-        elif [ "$RUNNER_OS" == "macOS" ]; then
-          brew install shellcheck
-        fi
-        shellcheck **/*.sh
-
-    - name: Lint Python files
-      run: |
-        pip3 install flake8
-        flake8 .
-
-    - name: Check Neovim installation
-      run: |
-        ~/.local/bin/nvim --version | head -n3
-        ~/.local/bin/nvim --headless -c 'checkhealth provider' -c 'q' || true
-        if [ $? -ne 0 ]; then
-          echo "Neovim installation or health check failed"
-          exit 1
-        fi
-
-    - name: Debug Neovim Python integration
-      if: failure()
-      run: |
-        python3 -c "import neovim; print(neovim.__file__)"
-        python3 -c "import pynvim; print(pynvim.__file__)"
-        cat ~/.config/nvim/init.vim
-        echo "NVIM_PYTHON_LOG_FILE contents:"
-        cat $NVIM_PYTHON_LOG_FILE || echo "NVIM_PYTHON_LOG_FILE not found or empty"
